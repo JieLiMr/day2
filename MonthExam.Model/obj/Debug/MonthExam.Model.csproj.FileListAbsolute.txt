@@ -1,0 +1,6 @@
+D:\八维\参考文档\1910A2022-03\SourceCode\MonthExam\MonthExam.Model\bin\Debug\MonthExam.Model.dll
+D:\八维\参考文档\1910A2022-03\SourceCode\MonthExam\MonthExam.Model\bin\Debug\MonthExam.Model.pdb
+D:\八维\参考文档\1910A2022-03\SourceCode\MonthExam\MonthExam.Model\obj\Debug\MonthExam.Model.csproj.AssemblyReference.cache
+D:\八维\参考文档\1910A2022-03\SourceCode\MonthExam\MonthExam.Model\obj\Debug\MonthExam.Model.csproj.CoreCompileInputs.cache
+D:\八维\参考文档\1910A2022-03\SourceCode\MonthExam\MonthExam.Model\obj\Debug\MonthExam.Model.dll
+D:\八维\参考文档\1910A2022-03\SourceCode\MonthExam\MonthExam.Model\obj\Debug\MonthExam.Model.pdb

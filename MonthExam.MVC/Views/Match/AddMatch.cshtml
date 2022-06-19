@@ -1,0 +1,282 @@
+﻿
+@{
+    ViewBag.Title = "竞赛信息 - 添加";
+}
+<script src="~/Scripts/vue.min.js"></script>
+<script src="~/Scripts/axios.min.js"></script>
+<link href="~/Scripts/EmementUI/theme-chalk/index.css" rel="stylesheet" />
+<script src="~/Scripts/EmementUI/index.js"></script>
+
+<h4>@ViewBag.Title</h4>
+<style>
+    .table{
+        margin-bottom:0px;
+    }
+</style>
+<div id="app">
+    <table class="table form-inline">
+        <tr class="bg-primary text-center">
+            <td>
+                A组
+            </td>
+            <td>
+                B组
+            </td>
+        </tr>
+        <tr>
+            <td>
+                姓名：<input type="text" v-model="form.userNameA" readonly class="form-control" />
+            </td>
+            <td>
+                姓名：<input type="text" v-model="form.userNameB" readonly class="form-control" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                手机：<input type="text" v-model="form.phoneA" readonly class="form-control" />
+            </td>
+            <td>
+                手机：<input type="text" v-model="form.phoneB" readonly class="form-control" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                地址：<input type="text" v-model="form.addressA" readonly class="form-control" />
+            </td>
+            <td>
+                地址：<input type="text" v-model="form.addressB" readonly class="form-control" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="#" v-on:click="showUserinfoList('a')" class="btn btn-warning">通讯录</a>
+                <a href="#" v-on:click="clearUserInfo('a')" class="btn btn-danger">清除</a>
+            </td>
+            <td>
+                <a href="#" v-on:click="showUserinfoList('b')" class="btn btn-warning">通讯录</a>
+                <a href="#" v-on:click="clearUserInfo('b')" class="btn btn-danger">清除</a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">竞赛名称：<input type="text" v-model="form.matchName" class="form-control"/>
+            
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">竞赛类型：
+                <a v-for="item in typeList" href="#" v-on:click="selTypeId(item.Value)" class="btn btn-success" style="margin:1px 5px;">{{item.Name}}</a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">举办日期：<input type="date" v-model="form.holdingTime" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="button" value="保存" class="btn btn-primary" v-on:click="save"/>
+            </td>
+        </tr>
+    </table>
+    <el-dialog title="通讯录" width="50%" :visible.sync="showUserInfo" center>
+        <table class="table form-inline">
+            <tr>
+                <td>
+                    信息：<input type="text" v-model="search" class="form-control" />
+                    <input type="button" value="查询" class="btn btn-primary" v-on:click="getUserList" />
+                </td>
+            </tr>
+        </table>
+        <table class="table table-bordered">
+            <tr class="bg-primary text-center">
+                <td>姓名</td>
+                <td>手机</td>
+                <td>家庭地址</td>
+                <td>操作</td>
+            </tr>
+            <tr v-for="item in userList" class="text-center">
+                <td>{{item.UserName}}</td>
+                <td>{{item.Phone}}</td>
+                <td>{{item.Address}}</td>
+                <td>
+                    <a href="#" @@click="selUser(item)">选择</a>
+                    <a href="#" @@click="upd(item)">修改</a>
+                </td>
+            </tr>
+        </table>
+        <div>
+            <el-pagination @@size-change="handleSizeChange"
+                           @@current-change="handleCurrentChange"
+                           :current-page="page.pageindex"
+                           :page-sizes="[1, 2, 3, 4]"
+                           :page-size="page.pagesize"
+                           layout="total, sizes, prev, pager, next, jumper"
+                           :total="page.TotalCount">
+            </el-pagination>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="warning" @@click="showUserInfo = false">关 闭</el-button>
+        </div>
+    </el-dialog>
+
+  
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                showUserInfo: false,
+                dialogTableVisiblea: false,
+                updinfor: {
+                    UserName: '',
+                    Phone: '',
+                    Address: '',
+                    UserId:''
+                    
+                },
+                operater: '',
+                form: {
+                    userNameA: '',
+                    phoneA: '',
+                    addressA: '',
+                    userNameB: '',
+                    phoneB: '',
+                    addressB: '',
+                    typeId: 0,
+                    matchName: '',
+                    holdingTime: ''
+                },
+                page: {
+                    pageindex: 1,
+                    pagesize: 2,
+                    TotalCount:'',
+                    PageCount:'',
+                },
+                search: '',
+                userList: [],
+                typeList: [
+                    { Value: 1, Name: '日PK' },
+                    { Value: 2, Name: '周PK' },
+                    { Value: 3, Name: '月PK' },
+                ]
+            }
+        },
+        methods: {
+            handleSizeChange(val) {
+                this.page.pagesize = val;
+                this.getUserList();
+            },
+            handleCurrentChange(val) {
+                this.page.pageindex = val;
+                this.getUserList();
+            },
+            upd(userInfo) {
+
+                    this.updinfor.UserName = userInfo.UserName;
+                    this.updinfor.Phone = userInfo.Phone;
+                    this.updinfor.Address = userInfo.Address;
+                    this.updinfor.UserId = userInfo.UserId;
+                console.log(this.updinfor);
+                // 关闭弹框
+                this.showUserInfo = false;
+                this.dialogTableVisiblea = true;
+            },
+            // 通讯录列表
+            getUserList() {
+                axios.get("http://localhost:62748/Api/Match/GetUserList?pageindex=" + this.page.pageindex + "&pagesize=" + this.page.pagesize + "&search=" + this.search).then(res => {
+                    this.userList = res.data.list;
+                    this.page.TotalCount = res.data.TotalCount;
+                })
+            },
+            // 显示通讯录
+            showUserinfoList(flag) {
+                this.operater = flag;
+                this.showUserInfo = true;
+            },
+            // 反填数据
+            selUser(userInfo) {
+                if (this.operater == "a") {
+                    // 判定A数据不能和B的数据重复
+                    if (this.form.userNameB != "") {
+                        if (this.form.userNameB == userInfo.UserName && this.form.phoneB == userInfo.Phone) {
+                            alert("A组不能选择和B组一样的成员！");
+                            // 关闭弹框
+                            this.showUserInfo = false;
+                            return;
+                        }
+                    }
+                    this.form.userNameA = userInfo.UserName;
+                    this.form.phoneA = userInfo.Phone;
+                    this.form.addressA = userInfo.Address;
+                }
+                if (this.operater == "b") {
+                    // 判定B数据不能和A的数据重复
+                    if (this.form.userNameA != "") {
+                        if (this.form.userNameA == userInfo.UserName && this.form.phoneA == userInfo.Phone) {
+                            alert("B组不能选择和A组一样的成员！");
+                            // 关闭弹框
+                            this.showUserInfo = false;
+                            return;
+                        }
+                    }
+                    this.form.userNameB = userInfo.UserName;
+                    this.form.phoneB = userInfo.Phone;
+                    this.form.addressB = userInfo.Address;
+                }
+                // 关闭弹框
+                this.showUserInfo = false;
+            },
+            // 清除数据
+            clearUserInfo(flag) {
+                if (flag == "a") {
+                    this.form.userNameA = "";
+                    this.form.phoneA = "";
+                    this.form.addressA = "";
+                }
+                if (flag == "b") {
+                    this.form.userNameB = "";
+                    this.form.phoneB = "";
+                    this.form.addressB = "";
+                }
+            },
+            // 选择竞赛类型
+            selTypeId(val) {
+                this.form.typeId = val;
+            },
+            save() {
+                // 非空判定
+                if (this.form.userNameA == "") {
+                    this.$message.info("请选择A组成员信息！");
+                    return;
+                }
+                if (this.form.userNameB == "") {
+                    this.$message.info("请选择B组成员信息！");
+                    return;
+                }
+                if (this.form.matchName == "") {
+                    alert("竞赛名称不能为空！");
+                    return;
+                }
+                if (this.form.typeId == 0) {
+                    alert("请选择竞赛类型！");
+                    return;
+                }
+                if (this.form.holdingTime =="") {
+                    alert("请选择举行日期！");
+                    return;
+                }
+                axios.post("http://localhost:62748/Api/Match/AddMatch",this.form).then(res => {
+                    if (res.data > 0) {
+                        this.$message.success("添加竞赛信息成功！");
+                    } else {
+                        this.$message.success("添加竞赛信息失败！");
+                    }
+                })
+
+            }
+        },
+        created() {
+            this.getUserList();
+        }
+    })
+</script>
